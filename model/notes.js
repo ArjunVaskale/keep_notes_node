@@ -6,6 +6,7 @@ const Schema = mongoose.Schema;
 
 const SomeModelSchema = new Schema({
   note: String,
+  email : String ,
 });
 
 
