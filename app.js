@@ -38,16 +38,24 @@ app.post('/signup' , async (req , res)=>{
     let newUser = await Users.create({
         username : username ,
         email : email,
-        password : await bcrypt.hashSync(password , 8)
+        password : bcrypt.hashSync(password, 8)
     })
 
-    const token = jwt.sign({ user_id : newUser._id , email } , process.env.JWT_SECRET_KEY , {expiresIn : "2h"});
 
-    newUser = newUser.toJSON();
-    newUser['token'] = token;
-    res.send(newUser);
+    const token = jwt.sign({ user_id : newUser._id , email } , process.env.JWT_SECRET_KEY , {expiresIn : "1h"});
+
+    const newUserResponse = {
+        _id: newUser._id,
+        username: newUser.username,
+        email: newUser.email,
+        token: token
+      };
+    
+
+      newUserResponse['token'] = token;
+    res.send(newUserResponse);
     }catch(err){
-        return res.send('error ,,,,,,,,,,,,,' , err);
+        return res.send('error......' , err);
     }
 });
 
@@ -61,16 +69,36 @@ app.post('/signin' , async (req , res)=>{
             const token = jwt.sign({user_id : isUserExists._id , email} , process.env.JWT_SECRET_KEY , {expiresIn : "2h"})
             return res.json({email : email , token : token });
         }else{
-            return res.send('Invalid password ...');
+            return res.status(400).send({
+                message: "Wrong password.",
+              })
         }
     }else{
-        return res.send("invalid email...");
+        return res.status(400).send({
+            message: "Invalid email address.",
+          })
     }
 });
 
 
 
 app.get('/' , async (req , res)=>{
+    try {
+
+        jwt.decode(req.headers.token);
+    }catch(err){
+        console.log("Catch Error" , err);
+        return res.send('Invalid Token.');
+    }
+    const isExpired = jwt.decode(req.headers.token);
+    if(!isExpired){
+        return res.send('Invalid Token.');
+    }
+    if (Date.now() >= isExpired.exp * 1000) {
+        return res.send('Expired Token.');
+      }else{
+        console.log("token not Expired");
+      }
         Notes.find({} ,{note : 1 , _id : 1} , (err , data )=>{
             if(err) throw err;
             res.json(data)
@@ -78,7 +106,18 @@ app.get('/' , async (req , res)=>{
 });
 
 app.get('/user' , async (req , res)=>{
-    console.log(req.headers.token);
+    try {
+        jwt.decode(req.headers.token);
+    }catch(err){
+        return res.send('Invalid Token.');
+    }
+    const isExpired = jwt.decode(req.headers.token);
+    if(!isExpired){
+        return res.send('Invalid Token.');
+    }
+    if (Date.now() >= isExpired.exp * 1000) {
+        return res.send('Expired Token.');
+    }
     const data = jwt.decode(req.headers.token);
     Notes.find({email : data.email} ,{note : 1 , _id : 1} , (err , data )=>{
         if(err) throw err;
