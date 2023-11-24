@@ -15,6 +15,7 @@ const mongoose = require('mongoose');
 const {ServerApiVersion } = require('mongodb');
 
 const URL = "mongodb+srv://root:mongopass@cluster0.42gwgmd.mongodb.net/?retryWrites=true&w=majority" ;
+// const URL = "mongodb://127.0.0.1:27017/keep_notes" ;
 
 mongoose.set('strictQuery', true);
 
