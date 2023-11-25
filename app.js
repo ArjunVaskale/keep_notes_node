@@ -84,26 +84,29 @@ app.post('/signin', async (req, res) => {
 
 
 app.get('/', async (req, res) => {
-    try {
 
-        jwt.decode(req.headers.token);
-    } catch (err) {
-        console.log("Catch Error", err);
-        return res.send('Invalid Token.');
-    }
-    const isExpired = jwt.decode(req.headers.token);
-    if (!isExpired) {
-        return res.send('Invalid Token.');
-    }
-    if (Date.now() >= isExpired.exp * 1000) {
-        return res.send('Expired Token.');
-    } else {
-        console.log("token not Expired");
-    }
-    Notes.find({}, { note: 1, _id: 1 }, (err, data) => {
-        if (err) throw err;
-        res.json(data)
-    })
+    return res.send('Server is working !!!');
+
+    
+    // try {
+    //     jwt.decode(req.headers.token);
+    // } catch (err) {
+    //     console.log("Catch Error", err);
+    //     return res.send('Invalid Token.');
+    // }
+    // const isExpired = jwt.decode(req.headers.token);
+    // if (!isExpired) {
+    //     return res.send('Invalid Token.');
+    // }
+    // if (Date.now() >= isExpired.exp * 1000) {
+    //     return res.send('Expired Token.');
+    // } else {
+    //     console.log("token not Expired");
+    // }
+    // Notes.find({}, { note: 1, _id: 1 }, (err, data) => {
+    //     if (err) throw err;
+    //     res.json(data)
+    // })
 });
 
 app.get('/user', async (req, res) => {
